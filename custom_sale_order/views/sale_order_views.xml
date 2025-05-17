@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit the view of pos.order to add vehicle  of the customer -->
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <header>
+                <button name="action_create_work_order"
+                        string="Create Work Order"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|', '|', ('has_work_order', '=', True), ('state', 'not in', ['sale', 'done']), ('state', '=', 'cancel')]}"
+                        type="object"/>
+<!--                    <button id="create_invoice_work" name="%(sale.action_view_sale_advance_payment_inv)d" string="Test"-->
+<!--                        type="action" class="btn-primary"/>-->
+            </header>
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_show_work_order"
+                        class="oe_stat_button"
+                        type="object" icon="fa-cogs"
+                        attrs="{'invisible': [('has_any_work_order', '=', False)]}">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Work Order</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//form" position="inside">
+                <field name="has_work_order" invisible="1"/>
+                <field name="has_any_work_order" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sale_order_pivot" model="ir.ui.view">
+        <field name="name">sale.order.view.pivot.inherit.custom.sale.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="invoiced_amount" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale.action_orders" model="ir.actions.act_window">
+        <field name="name">Sales Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="context">{}</field>
+        <field name="domain">[('state', 'not in', ('draft', 'sent'))]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new quotation, the first step of a new sale!
+            </p><p>
+                Once the quotation is confirmed, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+            </p>
+        </field>
+    </record>
+</odoo>
